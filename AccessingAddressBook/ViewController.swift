@@ -56,63 +56,40 @@ class ViewController: UIViewController {
                     for i in 0 ... nPeople - 1 {
 //                        let ref = CFArrayGetValueAtIndex(allPeople, i)
                         let ref: ABRecordRef = Unmanaged<ABRecordRef>.fromOpaque(COpaquePointer(CFArrayGetValueAtIndex(allPeople, i))).takeUnretainedValue()
-//                        print("ref \(ref)")
+                        
+                        let contact:Contact!
+                        
+                        let firstName: String?
+                        let lastName:String?
                         
                         if ABRecordCopyValue(ref, kABPersonFirstNameProperty) == nil { continue } else {
-                            guard let firstName: String = ABRecordCopyValue(ref, kABPersonFirstNameProperty).takeUnretainedValue() as? String else { return }
-                            print("firstName \(firstName)")
+                            guard let _firstName: String = ABRecordCopyValue(ref, kABPersonFirstNameProperty).takeUnretainedValue() as? String else { return }
+                            firstName = _firstName
+
                             
-                            }
+                        }
                         
+                        contact = Contact(name: firstName, number: 0)
+                        
+                        if ABRecordCopyValue(ref, kABPersonLastNameProperty) == nil { continue } else {
+                            guard let _lastName: String = ABRecordCopyValue(ref, kABPersonLastNameProperty).takeUnretainedValue() as? String else { return }
+                            lastName = _lastName
+                            
+                        }
+                        
+                        guard let _firstName = firstName else { return }
+                        guard let _lastName = lastName else { return }
+                        contact.name = _firstName + " " + _lastName
+                        
+                        self.contacts.append(contact)
                         
                     }
+                    
+                    self.tableView.reloadData()
                 }
                 
             })
-
         
-        
-//                    for ( int i = 0; i < nPeople; i++ )
-//                    {
-//                        ABRecordRef ref = CFArrayGetValueAtIndex( allPeople, i );
-//                        ...
-//                    }
-
-
-                    
-//                    let contactList: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
-//                    for record:ABRecordRef in contactList {
-                    
-//                        let contactPerson: ABRecordRef = record
-//                        print("contactPerson \(contactPerson)")
-                    
-//                        if let contactName: String = ABRecordCopyCompositeName(contactPerson).takeRetainedValue() as? String {
-//                            print("contactName \(contactName)")
-//                            
-//                        }
-                    
-//                        let emailArray:ABMultiValueRef = extractABEmailRef(ABRecordCopyValue(contactPerson, kABPersonEmailProperty))
-//                        
-//                        for (var j = 0; j < ABMultiValueGetCount(emailArray); ++j)
-//                        {
-//                            var emailAdd = ABMultiValueCopyValueAtIndex(emailArray, j)
-//                            var myString = extractABEmailAddress(emailAdd)
-//                            println("email: \(myString)")
-//                        }
-//                        
-//                        
-//                    }
-//
-//                    print("people \(people)")
-//                    
-//                    for person in people {
-//                        print(person)
-//                    }
-                    
-//            }
-//        
-//            })
-    
         case .Denied:
             //present alert that permisson was denied
             print("denied")
