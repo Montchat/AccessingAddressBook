@@ -61,7 +61,7 @@ class ViewController: UIViewController {
                         let firstName: Name?
                         let lastName:Name?
                         var phoneNumbers:[PhoneNumber]?
-                        var email:Email?
+                        var emails:[Email]?
                         
                         if ABRecordCopyValue(ref, kABPersonFirstNameProperty) == nil { continue } else {
                             
@@ -76,7 +76,6 @@ class ViewController: UIViewController {
                         } else {
                             
                             phoneNumbers = []
-                            print(ABRecordCopyValue(ref, kABPersonPhoneProperty).takeUnretainedValue())
                             
                             let multiValueRef: ABMultiValueRef = ABRecordCopyValue(ref, kABPersonPhoneProperty).takeUnretainedValue() as ABMultiValueRef
                             
@@ -96,16 +95,30 @@ class ViewController: UIViewController {
                         }
                         
                         if ABRecordCopyValue(ref, kABPersonEmailProperty) == nil {
-                            email = ""
+                            emails = [ ]
                         } else {
                             
-                            guard let _email: String = ABRecordCopyValue(ref, kABPersonEmailProperty).takeUnretainedValue() as? String else { return }
-                            email = _email
+                            emails = []
+                            
+                            let multiValueRef: ABMultiValueRef = ABRecordCopyValue(ref, kABPersonEmailProperty).takeUnretainedValue() as ABMultiValueRef
+                            
+                            let countOfEmails = ABMultiValueGetCount(multiValueRef)
+                            
+                            for index in 0..<countOfEmails {
+                                
+                                let unmanagedEmail = ABMultiValueCopyValueAtIndex(multiValueRef, index)
+                                
+                                let email : NSString = unmanagedEmail.takeUnretainedValue() as! NSString
+                                let _email = email as String
+                                
+                                emails?.append(_email)
+                                
+                            }
                             
                         }
                         
                         if ABRecordCopyValue(ref, kABPersonLastNameProperty) == nil {
-                            contact = Contact(name: firstName, phoneNumbers: phoneNumbers, email: email)
+                            contact = Contact(name: firstName, phoneNumbers: phoneNumbers, emails: emails)
                             dispatch_async(dispatch_get_main_queue(), {
                                 self.contacts.append(contact)
                                 
@@ -123,7 +136,7 @@ class ViewController: UIViewController {
                         guard let _firstName = firstName else { return }
                         guard let _lastName = lastName else { return }
                         
-                        contact = Contact(name: _firstName + " " + _lastName, phoneNumbers: nil, email: email)
+                        contact = Contact(name: _firstName + " " + _lastName, phoneNumbers: nil, emails: emails)
                         
                         dispatch_async(dispatch_get_main_queue(), {
                             self.contacts.append(contact)
@@ -180,12 +193,12 @@ class Contact {
     
     var name:Name?
     var phoneNumbers:[PhoneNumber]?
-    var email:Email?
+    var emails:[Email]?
     
-    init(name:Name?, phoneNumbers: [PhoneNumber]?, email: Email?) {
+    init(name:Name?, phoneNumbers: [PhoneNumber]?, emails: [Email]?) {
         self.name = name
         self.phoneNumbers = phoneNumbers
-        self.email = email
+        self.emails = emails
     }
     
 }
