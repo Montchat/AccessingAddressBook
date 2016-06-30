@@ -51,13 +51,23 @@ class ViewController: UIViewController {
                     
                         let allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
                         let nPeople = ABAddressBookGetPersonCount(addressBook)
+                    print("nPeople \(nPeople)")
                     
-                    for i in 0 ... nPeople {
-                        let ref = CFArrayGetValueAtIndex(allPeople, i)
-                        print("ref \(ref)")
+                    for i in 0 ... nPeople - 1 {
+//                        let ref = CFArrayGetValueAtIndex(allPeople, i)
+                        let ref: ABRecordRef = Unmanaged<ABRecordRef>.fromOpaque(COpaquePointer(CFArrayGetValueAtIndex(allPeople, i))).takeUnretainedValue()
+//                        print("ref \(ref)")
+                        
+                        if ABRecordCopyValue(ref, kABPersonFirstNameProperty) == nil { continue } else {
+                            guard let firstName: String = ABRecordCopyValue(ref, kABPersonFirstNameProperty).takeUnretainedValue() as? String else { return }
+                            print("firstName \(firstName)")
+                            
+                            }
+                        
                         
                     }
                 }
+                
             })
 
         
