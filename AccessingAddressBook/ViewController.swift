@@ -60,8 +60,8 @@ class ViewController: UIViewController {
                         
                         let firstName: Name?
                         let lastName:Name?
-                        let phoneNumbers:[PhoneNumber]?
-                        let email:Email?
+                        var phoneNumbers:[PhoneNumber]?
+                        var email:Email?
                         
                         if ABRecordCopyValue(ref, kABPersonFirstNameProperty) == nil { continue } else {
                             
@@ -71,16 +71,14 @@ class ViewController: UIViewController {
                         }
                         
                         if ABRecordCopyValue(ref, kABPersonPhoneProperty) == nil {
-                            print("n")
                             phoneNumbers = []
                             
                         } else {
                             
-                            print("working her")
-                            
+                            phoneNumbers = []
                             print(ABRecordCopyValue(ref, kABPersonPhoneProperty).takeUnretainedValue())
                             
-                            guard let multiValueRef: ABMultiValueRef = ABRecordCopyValue(ref, kABPersonPhoneProperty).takeUnretainedValue() as? ABMultiValueRef else { return }
+                            let multiValueRef: ABMultiValueRef = ABRecordCopyValue(ref, kABPersonPhoneProperty).takeUnretainedValue() as ABMultiValueRef
                             
                             let countOfPhones = ABMultiValueGetCount(multiValueRef)
                             
@@ -88,11 +86,12 @@ class ViewController: UIViewController {
                                 
                                 let unmanagedPhone = ABMultiValueCopyValueAtIndex(multiValueRef, index)
                                 
+                                let phoneNumber : NSString = unmanagedPhone.takeUnretainedValue() as! NSString
+                                let _phoneNumber = phoneNumber as String
+                                
+                                phoneNumbers?.append(_phoneNumber)
                                 
                             }
-                            
-                            
-                            phoneNumbers =  []
                             
                         }
                         
