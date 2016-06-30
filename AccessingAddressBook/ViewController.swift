@@ -62,12 +62,19 @@ class ViewController: UIViewController {
                             guard let _firstName: String = ABRecordCopyValue(ref, kABPersonFirstNameProperty).takeUnretainedValue() as? String else { return }
                             firstName = _firstName
 
-                            
                         }
                         
-                        contact = Contact(name: firstName, number: 0)
-                        
-                        if ABRecordCopyValue(ref, kABPersonLastNameProperty) == nil { continue } else {
+                        if ABRecordCopyValue(ref, kABPersonLastNameProperty) == nil {
+                            contact = Contact(name: firstName, number: 0)
+                            dispatch_async(dispatch_get_main_queue(), {
+                                self.contacts.append(contact)
+                                
+                            })
+                            
+                            continue
+                            
+                        } else {
+                            
                             guard let _lastName: String = ABRecordCopyValue(ref, kABPersonLastNameProperty).takeUnretainedValue() as? String else { return }
                             lastName = _lastName
                             
@@ -75,14 +82,12 @@ class ViewController: UIViewController {
                         
                         guard let _firstName = firstName else { return }
                         guard let _lastName = lastName else { return }
-                        contact.name = _firstName + " " + _lastName
+                        contact = Contact(name: _firstName + "" + _lastName, number: 0)
                         
                         dispatch_async(dispatch_get_main_queue(), {
                             self.contacts.append(contact)
                             
                         })
-                        
-                        
                         
                     }
                     
