@@ -12,6 +12,8 @@ import AddressBook
 class ViewController: UIViewController {
     
     typealias AddressBook = ABAddressBook
+    typealias PhoneNumber = String
+    typealias Email = String
     
     var addressBook:AddressBook!
     
@@ -56,11 +58,24 @@ class ViewController: UIViewController {
                         
                         let firstName: String?
                         let lastName:String?
+                        let phoneNumber:PhoneNumber?
+                        let email:Email?
                         
                         if ABRecordCopyValue(ref, kABPersonFirstNameProperty) == nil { continue } else {
+                            
                             guard let _firstName: String = ABRecordCopyValue(ref, kABPersonFirstNameProperty).takeUnretainedValue() as? String else { return }
                             firstName = _firstName
 
+                        }
+                        
+                        if ABRecordCopyValue(ref, kABPersonPhoneProperty) == nil {
+                            phoneNumber = "No Number Found"
+                            
+                        } else {
+                            
+                            guard let _phoneNumber: String = ABRecordCopyValue(ref, kABPersonPhoneProperty).takeUnretainedValue() as? String else { return }
+                            phoneNumber = _phoneNumber
+                            
                         }
                         
                         if ABRecordCopyValue(ref, kABPersonLastNameProperty) == nil {
@@ -135,14 +150,16 @@ class ViewController: UIViewController {
 class Contact {
     
     typealias Name = String
-    typealias Number = Int
+    typealias PhoneNumber = String
+    typealias Email = String
     
-    var number:Int?
     var name:Name?
+    var phoneNumber:PhoneNumber?
+    var email:Email?
     
-    init(name:Name?, number: Number?) {
+    init(name:Name?, phoneNumber: PhoneNumber?) {
         self.name = name
-        self.number = number
+        self.phoneNumber = phoneNumber
     }
     
 }
