@@ -170,21 +170,7 @@ class ViewController: UIViewController {
         }
         
     }
-    
-    func extractABEmailRef (abEmailRef: Unmanaged<ABMultiValueRef>!) -> ABMultiValueRef? {
-        if let ab = abEmailRef {
-            return Unmanaged<NSObject>.fromOpaque(ab.toOpaque()).takeUnretainedValue()
-        }
-        return nil
-    }
-    
-    func extractABEmailAddress (abEmailAddress: Unmanaged<AnyObject>!) -> String? {
-        if let _ = abEmailAddress {
-            return Unmanaged.fromOpaque(abEmailAddress.toOpaque()).takeUnretainedValue() as? CFStringRef as? String
-        }
-        return nil
-    }
-    
+        
 }
 
 class Contact {
