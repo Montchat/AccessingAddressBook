@@ -9,21 +9,6 @@
 import UIKit
 import AddressBook
 
-class Contact {
-    
-    typealias Name = String
-    typealias Number = Int
-    
-    var number:Int?
-    var name:Name?
-    
-    init(name:Name?, number: Number?) {
-        self.name = name
-        self.number = number
-    }
-    
-}
-
 class ViewController: UIViewController {
     
     typealias AddressBook = ABAddressBook
@@ -54,7 +39,7 @@ class ViewController: UIViewController {
             print("authorized")
             
             var error: Unmanaged<CFError>?
-            guard let addressBook: ABAddressBook? = ABAddressBookCreateWithOptions(nil, &error)?.takeRetainedValue() else { print(error?.takeRetainedValue()) ; return }
+            guard let addressBook: ABAddressBook = ABAddressBookCreateWithOptions(nil, &error)?.takeRetainedValue() else { print(error?.takeRetainedValue()) ; return }
             
             print("addressBook \(addressBook)")
             
@@ -63,19 +48,61 @@ class ViewController: UIViewController {
                     print("we have an error \(error)")
                     
                 } else {
-                    print("working")
-                    let people = ABAddressBookCopyArrayOfAllPeople(addressBook)?.takeRetainedValue()
-                    print("people \(people)")
                     
-                    //                    for person in people {
-                    //                        print("person \(person)")
-                    //
-                    //                    }
+                        let allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
+                        let nPeople = ABAddressBookGetPersonCount(addressBook)
                     
+                    for i in 0 ... nPeople {
+                        let ref = CFArrayGetValueAtIndex(allPeople, i)
+                        print("ref \(ref)")
+                        
+                    }
                 }
-                
             })
-            
+
+        
+        
+//                    for ( int i = 0; i < nPeople; i++ )
+//                    {
+//                        ABRecordRef ref = CFArrayGetValueAtIndex( allPeople, i );
+//                        ...
+//                    }
+
+
+                    
+//                    let contactList: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
+//                    for record:ABRecordRef in contactList {
+                    
+//                        let contactPerson: ABRecordRef = record
+//                        print("contactPerson \(contactPerson)")
+                    
+//                        if let contactName: String = ABRecordCopyCompositeName(contactPerson).takeRetainedValue() as? String {
+//                            print("contactName \(contactName)")
+//                            
+//                        }
+                    
+//                        let emailArray:ABMultiValueRef = extractABEmailRef(ABRecordCopyValue(contactPerson, kABPersonEmailProperty))
+//                        
+//                        for (var j = 0; j < ABMultiValueGetCount(emailArray); ++j)
+//                        {
+//                            var emailAdd = ABMultiValueCopyValueAtIndex(emailArray, j)
+//                            var myString = extractABEmailAddress(emailAdd)
+//                            println("email: \(myString)")
+//                        }
+//                        
+//                        
+//                    }
+//
+//                    print("people \(people)")
+//                    
+//                    for person in people {
+//                        print(person)
+//                    }
+                    
+//            }
+//        
+//            })
+    
         case .Denied:
             //present alert that permisson was denied
             print("denied")
@@ -92,7 +119,37 @@ class ViewController: UIViewController {
         
     }
     
+    func extractABEmailRef (abEmailRef: Unmanaged<ABMultiValueRef>!) -> ABMultiValueRef? {
+        if let ab = abEmailRef {
+            return Unmanaged<NSObject>.fromOpaque(ab.toOpaque()).takeUnretainedValue()
+        }
+        return nil
+    }
+    
+    func extractABEmailAddress (abEmailAddress: Unmanaged<AnyObject>!) -> String? {
+        if let _ = abEmailAddress {
+            return Unmanaged.fromOpaque(abEmailAddress.toOpaque()).takeUnretainedValue() as? CFStringRef as? String
+        }
+        return nil
+    }
+    
 }
+
+class Contact {
+    
+    typealias Name = String
+    typealias Number = Int
+    
+    var number:Int?
+    var name:Name?
+    
+    init(name:Name?, number: Number?) {
+        self.name = name
+        self.number = number
+    }
+    
+}
+
 
 class ContactsCell : UITableViewCell {
     
