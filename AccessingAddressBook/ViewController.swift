@@ -46,13 +46,14 @@ class ViewController: UIViewController {
             
             ABAddressBookRequestAccessWithCompletion(addressBook, { (granted, error) in
                 if error != nil {
+                    print("error \(error)")
                     
                 } else {
                     
                         let allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
                         let nPeople = ABAddressBookGetPersonCount(addressBook)
                     
-                    for i in 0 ... nPeople - 1 {
+                    for i in 0 ..< nPeople {
                         
                         let ref: ABRecordRef = Unmanaged<ABRecordRef>.fromOpaque(COpaquePointer(CFArrayGetValueAtIndex(allPeople, i))).takeUnretainedValue()
                         
@@ -70,7 +71,7 @@ class ViewController: UIViewController {
 
                         }
                         
-                        if ABRecordCopyValue(ref, kABPersonPhoneProperty) == nil {
+                        if ABRecordCopyValue(ref, kABPersonPhoneProperty) == nil { // if we don't have any phoneNumbers
                             phoneNumbers = []
                             
                         } else {
@@ -82,6 +83,8 @@ class ViewController: UIViewController {
                             let countOfPhones = ABMultiValueGetCount(multiValueRef)
                             
                             for index in 0..<countOfPhones {
+                                
+                                print("count \(index)")
                                 
                                 let unmanagedPhone = ABMultiValueCopyValueAtIndex(multiValueRef, index)
                                 
@@ -136,17 +139,16 @@ class ViewController: UIViewController {
                         guard let _firstName = firstName else { return }
                         guard let _lastName = lastName else { return }
                         
-                        contact = Contact(name: _firstName + " " + _lastName, phoneNumbers: nil, emails: emails)
+                        contact = Contact(name: _firstName + " " + _lastName, phoneNumbers: phoneNumbers, emails: emails)
                         
-                        dispatch_async(dispatch_get_main_queue(), {
-                            self.contacts.append(contact)
+                        dispatch_async(dispatch_get_main_queue(), { self.contacts.append(contact)
                             
                         })
                         
                     }
                     
-                    dispatch_async(dispatch_get_main_queue(), {
-                        self.tableView.reloadData()
+                    dispatch_async(dispatch_get_main_queue(), { self.tableView.reloadData()
+                        
                     })
                     
                 }
