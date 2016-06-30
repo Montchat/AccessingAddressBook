@@ -47,7 +47,6 @@ class ViewController: UIViewController {
                     
                         let allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
                         let nPeople = ABAddressBookGetPersonCount(addressBook)
-                    print("nPeople \(nPeople)")
                     
                     for i in 0 ... nPeople - 1 {
                         
@@ -66,6 +65,7 @@ class ViewController: UIViewController {
                         
                         if ABRecordCopyValue(ref, kABPersonLastNameProperty) == nil {
                             contact = Contact(name: firstName, number: 0)
+                            
                             dispatch_async(dispatch_get_main_queue(), {
                                 self.contacts.append(contact)
                                 
@@ -82,7 +82,8 @@ class ViewController: UIViewController {
                         
                         guard let _firstName = firstName else { return }
                         guard let _lastName = lastName else { return }
-                        contact = Contact(name: _firstName + "" + _lastName, number: 0)
+                        
+                        contact = Contact(name: _firstName + " " + _lastName, number: 0)
                         
                         dispatch_async(dispatch_get_main_queue(), {
                             self.contacts.append(contact)
@@ -155,7 +156,7 @@ class ContactsCell : UITableViewCell {
         
         self.contact = contact
         
-        super.init(style: .Default, reuseIdentifier: "cell")
+        super.init(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "cell")
         textLabel?.text = contact.name
         detailTextLabel?.text = "\(contact.number)"
         
