@@ -15,58 +15,59 @@ class ViewController: UIViewController {
     
     var addressBook:AddressBook!
     
-    func createAddressBook() -> Bool {
-        if self.addressBook != nil {
-            return true
-        }
-        var err : Unmanaged<CFError>? = nil
-        let addressBook : ABAddressBook? = ABAddressBookCreateWithOptions(nil, &err).takeRetainedValue()
-        if addressBook == nil {
-            print(err)
-            self.addressBook = nil
-            return false
-        }
-        self.addressBook = addressBook
-        return true
+override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    checkForAddressBookPermission()
+    
     }
     
-    func determineStatus() -> Bool {
-        let status = ABAddressBookGetAuthorizationStatus()
+    private func checkForAddressBookPermission() {
+        
+        let status:ABAuthorizationStatus = ABAddressBookGetAuthorizationStatus()
+        
         switch status {
         case .Authorized:
-            return self.createAddressBook()
-        case .NotDetermined:
-            var ok = false
+            print("authorized")
             
-            ABAddressBookRequestAccessWithCompletion(nil) {
-                (granted:Bool, err:CFError!) in
-                dispatch_async(dispatch_get_main_queue()) {
-                    if granted {
-                        ok = self.createAddressBook()
-                    }
+            var error: Unmanaged<CFError>?
+            guard let addressBook: ABAddressBook? = ABAddressBookCreateWithOptions(nil, &error)?.takeRetainedValue() else { print(error?.takeRetainedValue()) ; return }
+            
+            print("addressBook \(addressBook)")
+            
+            ABAddressBookRequestAccessWithCompletion(addressBook, { (granted, error) in
+                if error != nil {
+                    print("we have an error \(error)")
+                    
+                } else {
+                    print("working")
+                    let people = ABAddressBookCopyArrayOfAllPeople(addressBook)?.takeRetainedValue()
+                    print("people \(people)")
+                    
+//                    for person in people {
+//                        print("person \(person)")
+//                        
+//                    }
+                    
                 }
-            }
-            if ok == true {
-                return true
-            }
-            self.addressBook = nil
-            return false
-        case .Restricted:
-            self.addressBook = nil
-            return false
+                
+            })
+            
         case .Denied:
-            self.addressBook = nil
-            return false
+            //present alert that permisson was denied 
+            print("denied")
+            
+        case .NotDetermined:
+            print("not determined")
+            
+        case .Restricted:
+            print("restricted")
+            
+            //present alert that permission is restricted
+            
         }
+    
     }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        determineStatus()
-        
-        print("addressBook \(addressBook)")
-    }
-
+    
 }
 
