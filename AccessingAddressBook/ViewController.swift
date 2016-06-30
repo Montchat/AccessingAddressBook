@@ -36,16 +36,12 @@ class ViewController: UIViewController {
         
         switch status {
         case .Authorized:
-            print("authorized")
             
             var error: Unmanaged<CFError>?
             guard let addressBook: ABAddressBook = ABAddressBookCreateWithOptions(nil, &error)?.takeRetainedValue() else { print(error?.takeRetainedValue()) ; return }
             
-            print("addressBook \(addressBook)")
-            
             ABAddressBookRequestAccessWithCompletion(addressBook, { (granted, error) in
                 if error != nil {
-                    print("we have an error \(error)")
                     
                 } else {
                     
@@ -54,7 +50,7 @@ class ViewController: UIViewController {
                     print("nPeople \(nPeople)")
                     
                     for i in 0 ... nPeople - 1 {
-//                        let ref = CFArrayGetValueAtIndex(allPeople, i)
+                        
                         let ref: ABRecordRef = Unmanaged<ABRecordRef>.fromOpaque(COpaquePointer(CFArrayGetValueAtIndex(allPeople, i))).takeUnretainedValue()
                         
                         let contact:Contact!
@@ -81,11 +77,19 @@ class ViewController: UIViewController {
                         guard let _lastName = lastName else { return }
                         contact.name = _firstName + " " + _lastName
                         
-                        self.contacts.append(contact)
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.contacts.append(contact)
+                            
+                        })
+                        
+                        
                         
                     }
                     
-                    self.tableView.reloadData()
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.tableView.reloadData()
+                    })
+                    
                 }
                 
             })
